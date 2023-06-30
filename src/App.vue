@@ -1,7 +1,9 @@
 <script setup lang="ts">
+// import ImgPDF from './components/ImgPDF.vue';
 import CanvasPDF from './components/CanvasPDF.vue';
 </script>
 
 <template>
-  <CanvasPDF msg="Vite + Vue" />
+  <!-- <ImgPDF /> -->
+  <CanvasPDF />
 </template>
