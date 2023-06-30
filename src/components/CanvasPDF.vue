@@ -5,9 +5,11 @@
 </template>
 
 <script setup>
-// PDF 链接
-const pdfUrl = 'https://cdn.lipush.com/other/pdfjs@3.7.107/web/compressed.tracemonkey-pldi-09.pdf';
 const PDFJS = window.pdfjsLib;
+
+// PDF 链接
+// const pdfUrl = 'https://static.jetmobo.com/image/salecard-service/20230531/1685503646624.pdf';
+const pdfUrl = 'https://cdn.lipush.com/other/pdfjs@3.7.107/web/compressed.tracemonkey-pldi-09.pdf';
 
 // 创建用于渲染页面的Canvas元素
 function createCanvas() {
@@ -19,20 +21,34 @@ function createCanvas() {
 
 // 渲染页面到Canvas
 function renderPage(page, canvas) {
-  var viewport = page.getViewport({ scale: 1 });
-  console.log(viewport);
-  var context = canvas.getContext('2d');
-  canvas.height = viewport.height;
-  canvas.width = viewport.width;
-  // canvas.height = window.innerHeight;
-  // canvas.width = window.innerWidth;
+  const viewport = page.getViewport({ scale: 1 });
+  const context = canvas.getContext('2d');
 
-  return page.render({ canvasContext: context, viewport: viewport }).promise;
+  const windowAspectRatio = window.innerWidth / window.innerHeight;
+  const pageAspectRatio = viewport.width / viewport.height;
+
+  let scale;
+  if (windowAspectRatio > pageAspectRatio) {
+    scale = window.innerHeight / viewport.height;
+  } else {
+    scale = window.innerWidth / viewport.width;
+  }
+
+  const scaledViewport = page.getViewport({ scale });
+
+  canvas.height = scaledViewport.height;
+  canvas.width = scaledViewport.width;
+
+  const renderContext = {
+    canvasContext: context,
+    viewport: scaledViewport,
+  };
+
+  return page.render(renderContext).promise;
 }
 
 // 加载PDF并在多个Canvas中渲染所有页面
 async function renderPDF(pdfURL) {
-  // try {
   PDFJS.getDocument(pdfURL).promise.then(function (pdf) {
     var pageCount = pdf.numPages;
     var canvases = [];
@@ -56,36 +72,6 @@ async function renderPDF(pdfURL) {
     // 从第一页开始渲染
     renderPageAtIndex(0);
   });
-  // } catch (error) {
-  // if (String(error).indexOf('response.body.getReader') > -1) {
-  // 某些浏览器内核不支持 Fetch - response.body.getReader 的模式，专门在这里修复
-  // const pdfData = await fetch(new URL(pdfURL, window.location).href);
-  // const arrayBufferPdf = await pdfData.arrayBuffer(); // 转成 ArrayBuffer 塞给 pdf.js
-  // PDFJS.getDocument({ data: arrayBufferPdf }).promise.then(function (pdf) {
-  //   var pageCount = pdf.numPages;
-  //   var canvases = [];
-
-  //   // 创建足够数量的Canvas元素
-  //   for (var i = 0; i < pageCount; i++) {
-  //     canvases.push(createCanvas());
-  //   }
-
-  //   function renderPageAtIndex(pageIndex) {
-  //     pdf.getPage(pageIndex + 1).then(function (page) {
-  //       return renderPage(page, canvases[pageIndex]).then(function () {
-  //         if (pageIndex < pageCount - 1) {
-  //           // 渲染下一页
-  //           renderPageAtIndex(pageIndex + 1);
-  //         }
-  //       });
-  //     });
-  //   }
-
-  //   // 从第一页开始渲染
-  //   renderPageAtIndex(0);
-  // });
-  // }
-  // }
 }
 renderPDF(pdfUrl);
 </script>
