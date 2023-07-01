@@ -8,7 +8,6 @@
 const PDFJS = window.pdfjsLib;
 
 // PDF 链接
-// const pdfUrl = 'https://static.jetmobo.com/image/salecard-service/20230531/1685503646624.pdf';
 const pdfUrl = 'https://cdn.lipush.com/other/pdfjs@3.7.107/web/compressed.tracemonkey-pldi-09.pdf';
 
 // 创建用于渲染页面的Canvas元素
